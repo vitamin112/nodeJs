@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Fira+Mono:wght@500&display=swap");
+
+.not-found-page {
+  background: #000000;
+  text-align: center;
+  color: #e0e0e0;
+  font-family: "Fira Mono", monospace;
+
+  h1 {
+    font-size: 2.5rem;
+    font-family: "Permanent Marker", cursive;
+  }
+  div {
+    transform-style: preserve-3d;
+  }
+
+  .img {
+    text-align: center;
+    width: clamp(300px, 70%, 600px);
+    height: 70vh;
+    transform: translateY(150px);
+    transition: all 0.2s linear;
+    animation: launch 1.5s linear forwards;
+    img {
+      animation: move 4s linear infinite 2s;
+    }
+  }
+
+  @keyframes move {
+    25% {
+      transform: translateX(5px);
+    }
+    50% {
+      transform: translateX(0px);
+    }
+    75% {
+      transform: translateX(-5px);
+    }
+    100% {
+      transform: translateX(0px);
+    }
+  }
+
+  @keyframes launch {
+    from {
+      transform: translateY(150px);
+    }
+    to {
+      perspective: 500px;
+      transform: translateY(0px);
+    }
+  }
+  #stars {
+    animation: twinkling 2s linear;
+  }
+  @keyframes twinkling {
+    from {
+      transform: scale(0);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  .text {
+    opacity: 0;
+    animation: appear 1s ease-in forwards;
+    animation-delay: 1.8s;
+    padding-bottom: 20px;
+  }
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  a {
+    color: #f66947;
+    text-decoration: none;
+  }
+}

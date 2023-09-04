@@ -1,0 +1,244 @@
+<h2>Khóa học đã xóa</h2>
+<div class="container-fluid">
+<a href="/me/stored/courses" class="btn btn-info my-2 px-4">Home</a>
+
+    <div id="toast" class="hidden">
+       this were be deleted
+    </div>
+
+<form class="select-form" id="select-form" method="POST" action="/courses/handleTrashCourses">
+  <div class="form-check py-2 d-flex align-items-center gap-2">
+    <input class="form-check-input" type="checkbox" value="" id="select-all">
+    <label class="form-check-label " for="select-all">
+      Select All
+    </label>
+  
+    <select class="form-select d-inline-block" name="action" id="form-action" required>
+      <option value="">--Select--</option>
+      <option value="restore">Restore</option>
+      <option value="delete">Delete</option>
+    </select> 
+
+    <button class="submit-select-form btn btn-success" id="select-all-btn" disabled  data-bs-toggle="modal" data-bs-target="#deleteAllModel" >Action</button>
+
+  </div>
+
+  <table class="table table-dark table-hover" >
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col" colspan="2">deletedAt</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each Courses}}
+      <tr>
+         <td border="1" >
+             <input 
+             class="form-check-input select-item" 
+             name="selectItems[]" 
+             type="checkbox" value="{{this._id}}" >
+          </td>
+          <td border="1">{{sum @index 1}}</td>
+          <td border="1">{{this.name}}</td>
+          <td border="1">{{this.description}}</td>
+          <td border="1">{{this.deletedAt}}</td>
+          <td border="1">
+            <a data-ID="{{this._id}}" class='btn bg-info restore-button' >ReStore</a> 
+            <a data-ID="{{this._id}}" class='btn bg-danger data-button' data-bs-toggle="modal" data-bs-target="#deleteModel">Delete</a>
+          </td>
+          </div>
+      </tr>
+      {{else}}
+      <tr>
+        <td colspan="5" class="text-center">
+          <h1>There's nothing here! </h1>
+          <p><a class="btn btn-info" href="/me/stored/courses">Course list</a></p>
+        </td>
+      </tr>
+      {{/each}}
+    
+    </tbody>
+  </table>
+  
+  <div class="modal fade" id="deleteModel" tabindex="-1" aria-labelledby="deleteModelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModelLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <strong class="text-danger bg-warning">Are you sure you want to delete this?</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="delete-btn" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="deleteAllModel" tabindex="-1" aria-labelledby="deleteAllModelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModelLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <strong class="text-danger bg-warning" id="message"> </strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="delete-all-btn" class="btn  btn-success">Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<form method="POST" id="delete-form" ></form>
+<form method="POST" id="restore-form" ></form>
+
+<script>
+  let dataButtons = document.querySelectorAll('.data-button');
+  let selectItems = document.querySelectorAll('.select-item');
+  let restoreButtons = document.querySelectorAll('.restore-button');
+  let selectAll= document.getElementById('select-all');
+  let selectAllBtn= document.getElementById('select-all-btn');
+  let deleteAllBtn= document.getElementById('delete-all-btn');
+  let deleteBtn = document.getElementById('delete-btn');
+  let selectForm= document.getElementById('select-form');
+  let deleteForm= document.getElementById('delete-form');
+  let Action= document.getElementById('form-action');
+  let restoreForm= document.getElementById('restore-form');
+  let deleteAllModel= document.getElementById('deleteAllModel');
+  let numberItems= selectItems.length;
+  let deleteID;
+  let restoreID;
+ 
+
+    ///-- click DELETE btn --
+    dataButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+              deleteID  = button.getAttribute('data-ID');
+        });
+    });
+    deleteBtn.onclick=()=>{
+        deleteForm.action = `/courses/${deleteID}/force?_method=DELETE`;  
+        deleteForm.submit();
+    }
+
+    ///-- click RESTORE btn --
+    
+    restoreButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+
+            restoreID  = button.getAttribute('data-ID');
+            restoreForm.action = `/courses/${restoreID}/restore?_method=PATCH`;  
+            restoreForm.submit();
+        });
+    });
+   
+    //click SELECT ALL btn
+    selectAll.onchange=()=>{
+        if(selectAll.checked){
+          selectItems.forEach(item=>item.checked=true);
+        }
+        else{
+          selectItems.forEach(item=>item.checked=false);
+        }
+    }
+
+    selectAllBtn.onclick=(e)=>{
+        e.preventDefault();
+      }
+      
+    deleteAllBtn.onclick=(e)=>{
+      selectForm.submit();
+    }
+
+    // change action form
+    Action.onchange = function(){
+      if( Action.value !="" && countSelectedItems() != 0)
+          selectAllBtn.disabled = false;
+      else{
+          selectAllBtn.disabled = true;
+      }
+      ///selectAllBtn
+      let action=this.value
+      document.getElementById('message').innerText =  "Are you sure you want to " +action;
+    
+      switch(action){
+        case "delete":
+          selectAllBtn.innerText="Delete";
+          selectAllBtn.classList.add('btn-danger');
+          deleteAllBtn.classList.add("btn-danger");
+          deleteAllBtn.innerText="Delete";
+          break;
+        case "restore":
+          selectAllBtn.classList.remove("btn-danger");
+          deleteAllBtn.classList.remove("btn-danger");
+          selectAllBtn.innerText="Restore";
+          deleteAllBtn.innerText="Restore";
+          break;
+        default:
+          selectAllBtn.innerText="Action";
+          selectAllBtn.classList.remove("btn-danger");
+          break;
+      }
+    }
+
+    //check number of selected items
+    function countSelectedItems(){
+      let result = 0;
+      selectItems.forEach(item=>
+       { if(item.checked)
+          result++;}
+      );
+      return result;
+    }
+
+    //show selectAllItemsBtn
+    document.querySelectorAll('input[type=checkbox]').forEach(item=>{
+      item.addEventListener('change', function() {
+      if (countSelectedItems() != 0 && Action.value !="") {
+        selectAllBtn.disabled = false;
+      } else {
+        selectAllBtn.disabled = true;
+      }
+     }); 
+    })
+
+    //change the selected
+    selectItems.forEach(item=>
+      item.addEventListener("click",()=>{
+        if(countSelectedItems() == numberItems){
+          selectAll.checked=true;
+        }
+        else{
+          selectAll.checked=false;
+        }
+      })
+    );
+
+    //show liveToastBtn
+    const showToastButton = document.getElementById('showToast');
+    const toast = document.getElementById('toast');
+
+    deleteAllBtn.addEventListener('click', () => {
+      // Hiển thị toast
+      toast.style.display = 'block';
+      toast.style.display = 'block';
+
+      // Tự động ẩn toast sau 1 giây
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 1000);
+    });
+
+</script>
+
