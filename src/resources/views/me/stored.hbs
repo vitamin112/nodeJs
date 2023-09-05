@@ -24,9 +24,18 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col">ID</th>
-        <th scope="col">Name</th>
-        <th scope="col">Description</th>
-        <th scope="col" colspan="2">Date</th>
+        <th scope="col">
+          Name
+         {{{sortable 'name' _sort}}}
+        </th> 
+        <th scope="col">
+          Description  
+         {{{sortable 'description' _sort}}}
+        </th>
+        <th scope="col" colspan="2">
+          Date  
+         {{{sortable 'date' _sort}}} 
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -184,21 +193,6 @@
         }
       })
     );
-
-    //show liveToastBtn
-    const showToastButton = document.getElementById('showToast');
-    const toast = document.getElementById('toast');
-
-    showToastButton.addEventListener('click', () => {
-      // Hiển thị toast
-      toast.style.display = 'block';
-      toast.style.display = 'block';
-
-      // Tự động ẩn toast sau 1 giây
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 1000);
-    });
 
 </script>
 

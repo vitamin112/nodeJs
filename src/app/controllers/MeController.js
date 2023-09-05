@@ -10,7 +10,15 @@ class MeController {
 
   // [GET] /me/stored
   stored(req, res, next) {
-    Promise.all([courses.find({}), courses.countDocumentsDeleted()])
+    let coursesQuery = courses.find({});
+
+    if (req.query.hasOwnProperty("_sort")) {
+      coursesQuery = coursesQuery.sort({
+        [req.query.column]: req.query.type,
+      });
+    }
+
+    Promise.all([coursesQuery, courses.countDocumentsDeleted()])
       .then(([Courses, deletedCount]) =>
         res.render("me/stored", {
           Courses: listMoongooseObject(Courses),
@@ -22,8 +30,15 @@ class MeController {
 
   // [GET] /me/trash
   trashCourses(req, res, next) {
-    courses
-      .findWithDeleted({ deleted: true })
+    let coursesQuery = courses.findWithDeleted({ deleted: true });
+
+    if (req.query.hasOwnProperty("_sort")) {
+      coursesQuery = coursesQuery.sort({
+        [req.query.column]: req.query.type,
+      });
+    }
+
+    coursesQuery
       .then((Courses) =>
         res.render("me/trash", { Courses: listMoongooseObject(Courses) })
       )
