@@ -6,7 +6,7 @@ const route = require("./routes");
 const methodOverride = require("method-override");
 const db = require("./config/db");
 
-const SortMiddleware = require("./app/middlewares/sortMiddleware.s");
+const SortMiddleware = require("./app/middlewares/sortMiddleware");
 
 // connext db
 db.connect();
